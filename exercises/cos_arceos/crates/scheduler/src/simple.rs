@@ -1,11 +1,12 @@
 use alloc::{collections::VecDeque, sync::Arc};
-use core::ops::Deref;
+use core::{ops::Deref, sync::atomic::{AtomicI8, AtomicU8}};
 
 use crate::BaseScheduler;
 
 /// A task wrapper for the [`SimpleScheduler`].
 pub struct SimpleTask<T> {
     inner: T,
+    cost_time: AtomicU8,
 }
 
 impl<T> SimpleTask<T> {
@@ -13,6 +14,7 @@ impl<T> SimpleTask<T> {
     pub const fn new(inner: T) -> Self {
         Self {
             inner,
+            cost_time: AtomicU8::new(10),
         }
     }
 
@@ -82,7 +84,8 @@ impl<T> BaseScheduler for SimpleScheduler<T> {
     }
 
     fn task_tick(&mut self, _current: &Self::SchedItem) -> bool {
-        true 
+        let cost = _current.cost_time.fetch_sub(1, core::sync::atomic::Ordering::Relaxed);
+        cost < 1
     }
 
     fn set_priority(&mut self, _task: &Self::SchedItem, _prio: isize) -> bool {
