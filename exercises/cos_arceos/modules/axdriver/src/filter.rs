@@ -1,9 +1,12 @@
+#[cfg(net)]
 use driver_net::{NetBufPtr, EthernetAddress};
-use driver_common::{DeviceType, DevResult} ;
+use driver_common::{DeviceType, DevResult};
+
 pub struct NetFilter<T> {
     pub inner: T,
 }
 
+#[cfg(net)]
 impl<T: driver_common::BaseDriverOps> driver_common::BaseDriverOps for NetFilter<T> {
     fn device_name(&self) -> &str {
         self.inner.device_name()
@@ -14,6 +17,7 @@ impl<T: driver_common::BaseDriverOps> driver_common::BaseDriverOps for NetFilter
     }
 }
 
+#[cfg(net)]
 impl<T: driver_net::NetDriverOps> driver_net::NetDriverOps for NetFilter<T>{
     fn mac_address(&self) -> EthernetAddress{
         self.inner.mac_address()
